@@ -9,7 +9,6 @@
 # 00217052 - Txai Wieser
 #
 
-import PersistenceHandler
 import GrammarReader
 
 def showIntro():
