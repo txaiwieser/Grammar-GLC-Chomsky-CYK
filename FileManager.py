@@ -20,51 +20,51 @@ def readFileWith(name):
     return arq.readlines()
 
 def findCharInsideBrackets(string):
-	selection = re.search(r"\[ ([A-Za-z]+) \]", string)
-	if selection != None:
-		return selection.group(1)
-	else:
-		return None
+    selection = re.search(r"\[ ([A-Za-z]+) \]", string)
+    if selection != None:
+        return selection.group(1)
+    else:
+        return None
 
 def findAndRemoveCharInsideBrackets(string):
-	selection = re.search(r"\[ ([A-Za-z]+) \]", string)
-	if selection != None:
-		return string[:selection.start()] + string[selection.end():]
-	else:
-		return None
+    selection = re.search(r"\[ ([A-Za-z]+) \]", string)
+    if selection != None:
+        return string[:selection.start()] + string[selection.end():]
+    else:
+        return None
 
 def extractGrammar(fileString, terminals, variables, initial, rules):
-	current = None
-	for line in fileString:
-		if line.startswith('#Terminais'):
-			current = "terminals"
-		elif line.startswith('#Variaveis'):
-			current = "variables"
-		elif line.startswith('#Inicial'):
-			current = "initial"
-		elif line.startswith('#Regras'):
-			current = "rules"
-		else:
-			char = findCharInsideBrackets(line)
-			
-			if current == "terminals":
-				terminals.append(char)
-			elif current == "variables":
-				variables.append(char)
-			elif current == "initial":
-				initial.append(char)
-			elif current == "rules":
-				char = findCharInsideBrackets(line)
-				line = findAndRemoveCharInsideBrackets(line)
-				var = char
-				char = findCharInsideBrackets(line)
-				line = findAndRemoveCharInsideBrackets(line)
-				prods = []
-				while char != None:
-					prods.append(char)
-					char = findCharInsideBrackets(line)
-					line = findAndRemoveCharInsideBrackets(line)
+    current = None
+    for line in fileString:
+        if line.startswith('#Terminais'):
+            current = "terminals"
+        elif line.startswith('#Variaveis'):
+            current = "variables"
+        elif line.startswith('#Inicial'):
+            current = "initial"
+        elif line.startswith('#Regras'):
+            current = "rules"
+        else:
+            char = findCharInsideBrackets(line)
 
-				rules.append((var, prods))
-			else:
-				print("Unknown line type")
+            if current == "terminals":
+                terminals.append(char)
+            elif current == "variables":
+                variables.append(char)
+            elif current == "initial":
+                initial.append(char)
+            elif current == "rules":
+                char = findCharInsideBrackets(line)
+                line = findAndRemoveCharInsideBrackets(line)
+                var = char
+                char = findCharInsideBrackets(line)
+                line = findAndRemoveCharInsideBrackets(line)
+                prods = []
+                while char != None:
+                    prods.append(char)
+                    char = findCharInsideBrackets(line)
+                    line = findAndRemoveCharInsideBrackets(line)
+
+                rules.append((var, prods))
+            else:
+                print("Unknown line type")
