@@ -48,11 +48,11 @@ def extractGrammar(fileString, terminals, variables, initial, rules):
             char = findCharInsideBrackets(line)
 
             if current == "terminals":
-                terminals.append(char)
+                terminals.add(char)
             elif current == "variables":
-                variables.append(char)
+                variables.add(char)
             elif current == "initial":
-                initial.append(char)
+                initial.add(char)
             elif current == "rules":
                 char = findCharInsideBrackets(line)
                 line = findAndRemoveCharInsideBrackets(line)
@@ -65,6 +65,9 @@ def extractGrammar(fileString, terminals, variables, initial, rules):
                     char = findCharInsideBrackets(line)
                     line = findAndRemoveCharInsideBrackets(line)
 
-                rules.append((var, prods))
+                if len(prods) == 1 and prods[0] == "V":
+                    prods = []
+
+                rules.add((var, tuple(prods)))
             else:
                 print("Unknown line type")

@@ -11,10 +11,10 @@
 
 import FileManager
 
-terminals = []
-variables = []
-initial = []
-rules = []
+terminals = set()
+variables = set()
+initial = set()
+rules = set()
 
 def showMenu():
     print("Leitor de Grámatica, escolha uma opção para exibir:\n")
