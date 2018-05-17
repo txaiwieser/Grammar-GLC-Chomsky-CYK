@@ -22,7 +22,8 @@ def showMenu():
     print("2 - Variaveis")
     print("3 - Simbolo Inicial")
     print("4 - Regras de Producao")
-    print("X - Voltar")
+    print("5 - Tudo")
+    print("X - Sair")
 
     option = input("-> ")
     option = str(option)
@@ -44,6 +45,9 @@ def showMenu():
         print("Regras:")
         print("\n".join(map(lambda x: x[0] + " -> " + " | ".join(x[1]), rules)))
 
+    elif option == "5":
+        printGrammar()
+
     else:
         return -1
 
@@ -54,6 +58,15 @@ def printList(list):
     string = ', '.join(list)
     print(string)
 
+def printGrammar():
+    print("Terminais: ")
+    printList(terminals)
+    print("\nVariaveis:")
+    printList(variables)
+    print("\nSimbolo Inicial:")
+    print("".join(initial))
+    print("\nRegras:")
+    print("\n".join(map(lambda x: x[0] + " -> " + " | ".join(x[1]), rules)))
 
 def start():
     fileName = FileManager.askForFileName()
