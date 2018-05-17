@@ -10,6 +10,7 @@
 #
 
 import FileManager
+import RemoveUselessSymbols
 
 terminals = set()
 variables = set()
@@ -23,6 +24,7 @@ def showMenu():
     print("3 - Simbolo Inicial")
     print("4 - Regras de Producao")
     print("5 - Tudo")
+    print("6 - Resultado da Remoção de Símbolos Inúteis")
     print("X - Sair")
 
     option = input("-> ")
@@ -46,7 +48,11 @@ def showMenu():
         print("\n".join(map(lambda x: x[0] + " -> " + " | ".join(x[1]), rules)))
 
     elif option == "5":
-        printGrammar()
+        printGrammar(terminals, variables, initial, rules)
+
+    elif option == "6":
+        G2 = RemoveUselessSymbols.removeUselessSymbols(terminals, variables, initial, rules)
+        printGrammar(G2[0], G2[1], G2[2], G2[3])
 
     else:
         return -1
@@ -58,15 +64,15 @@ def printList(list):
     string = ', '.join(list)
     print(string)
 
-def printGrammar():
+def printGrammar(t, v, i, r):
     print("Terminais: ")
-    printList(terminals)
+    printList(t)
     print("\nVariaveis:")
-    printList(variables)
+    printList(v)
     print("\nSimbolo Inicial:")
-    print("".join(initial))
+    print("".join(i))
     print("\nRegras:")
-    print("\n".join(map(lambda x: x[0] + " -> " + " | ".join(x[1]), rules)))
+    print("\n".join(map(lambda x: x[0] + " -> " + " | ".join(x[1]), r)))
 
 def start():
     fileName = FileManager.askForFileName()
