@@ -34,7 +34,6 @@ def firstStep(terminals, variables, initial, rules):
         if not (len(VE) > oldLenVE):
             break
 
-    print(VE)
     return secondStep(VE, terminals, variables, initial, rules)
 
 
@@ -70,8 +69,6 @@ def secondStep(VE, terminals, variables, initial, rules):
         if not (len(P1) > oldLenP1):
             break
 
-
-    print(P1)
     return thirdStep(VE, terminals, variables, initial, P1)
 
 
