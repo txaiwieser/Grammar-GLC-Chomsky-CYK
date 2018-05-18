@@ -89,7 +89,7 @@ def printGrammar(t, v, i, r):
     print("\nSimbolo Inicial:")
     print("".join(i))
     print("\nRegras:")
-    print("\n".join(map(lambda x: x[0] + " -> " + " | ".join(x[1]), r)))
+    print("\n".join(map(lambda x: x[0] + " -> " + "".join(x[1]), r)))
 
 
 def showMenuFor(fileName):
