@@ -20,7 +20,7 @@ def generateClosure(var, variables, rules, closure):
 
 def initializeNewRules(rules, variables):
     P1 = set()
-    print variables
+
     for rule in rules:
         if len(rule[1]) is 1:
             if rule[1][0] not in variables:
@@ -30,12 +30,11 @@ def initializeNewRules(rules, variables):
     return P1
 
 
-def secondStep(terminals, variables, rules, closures):
-    P1 = initializeNewRules(rules, terminals)
+def secondStep(variables, rules, closures):
+    P1 = initializeNewRules(rules, variables)
 
     for var in variables:
         if closures[var]:
-            print closures[var]
             for closure in closures[var]:
                 for rule in rules:
                     if closure is rule[0]:
@@ -44,17 +43,18 @@ def secondStep(terminals, variables, rules, closures):
                                 P1.add((var, rule[1]))
                         else:
                             P1.add((var, rule[1]))
+
     return P1
 
 
-def firstStep(terminals, variables, rules):
+def firstStep(variables, rules):
     closures = {}
-    print(len(rules))
     for var in variables:
         closures[var] = set()
         generateClosure(var, variables, rules, closures[var])
 
-    return secondStep(terminals, variables, rules, closures)
+    return secondStep(variables, rules, closures)
+
 
 def generate(terminals, variables, initial, rules):
-    return terminals, variables, initial, firstStep(terminals, variables, rules)
+    return terminals, variables, initial, firstStep(variables, rules)
