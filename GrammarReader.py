@@ -14,6 +14,7 @@ import FileManager
 import RemoveUselessSymbols
 import RemoveEmptyProductions
 import ProductionsSubstituteVariables
+import NormalFormOfChomsky
 
 terminals = set()
 variables = set()
@@ -31,6 +32,7 @@ def showMenu():
     print("6 - Resultado da Remoção de Símbolos Inúteis")
     print("7 - Resultado da Remoção de Produções Vazias")
     print("8 - Resultado das Produções que Substituem Variáveis")
+    print("9 - Resultado da Forma Normal de Chomsky")
     print("X - Sair")
 
     option = input("-> ")
@@ -66,6 +68,10 @@ def showMenu():
 
     elif option == "8":
         G2 = ProductionsSubstituteVariables.generate(terminals, variables, initial, rules)
+        printGrammar(G2[0], G2[1], G2[2], G2[3])
+
+    elif option == "9":
+        G2 = NormalFormOfChomsky.generate(terminals, variables, initial, rules)
         printGrammar(G2[0], G2[1], G2[2], G2[3])
 
     else:

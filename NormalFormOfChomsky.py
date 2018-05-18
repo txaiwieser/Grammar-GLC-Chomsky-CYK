@@ -1,8 +1,18 @@
-import FileManager
+# coding=utf-8
+#
+# Versão do Python: 3.6.5
+#
+# Trabalho LINGUAGENS FORMAIS E AUTOMATOS
+#
+# Grupo:
+# 00230091 - Rodrigo Rech
+# 00229724 - Flávio Keglevich
+# 00217052 - Txai Wieser
+#
+
 import RemoveEmptyProductions
 import RemoveUselessSymbols
 import ProductionsSubstituteVariables
-import GrammarReader
 
 
 def firstStep(terminals, variables, initial, rules):
@@ -65,7 +75,6 @@ def thirdStep(terminals, variables, initial, rules):
     for rule in toDeleteRules:
         rulesList.remove(rule)
 
-    print(rulesList)
     return terminals, set(newVariables), initial, set(rulesList)
 
 
