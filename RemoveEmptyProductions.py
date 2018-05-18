@@ -38,14 +38,15 @@ def firstStep(terminals, variables, initial, rules):
 
 
 def addRemovedXRuleIfNeeded(rule, VE, P1):
-    for symbol in rule[1]:
+    ruleTail = rule[1]
+    for i in range(0, len(ruleTail)):
+        symbol = ruleTail[i]
         if symbol in VE:
-            asList = list(rule[1])
-            asList.remove(symbol)
+            asList = list(ruleTail)
+            asList.pop(i)
             asTuple = tuple(asList)
             newRule = (rule[0], asTuple)
             P1.add(newRule)
-            break
 
 
 def secondStep(VE, terminals, variables, initial, rules):
