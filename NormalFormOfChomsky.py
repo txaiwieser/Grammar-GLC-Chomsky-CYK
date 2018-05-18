@@ -38,10 +38,27 @@ def secondStep(terminals, variables, initial, rules):
 
 
 def thirdStep(terminals, variables, initial, rules):
-    newVariables = variables
-    newRules = rules
+    newVariables = list(variables.copy())
+    newRules = list(rules.copy())
+    productionCounter = 1
 
-    return terminals, newVariables, initial, newRules
+    for rule in newRules:
+        if len(rule[1]) >= 3:
+            tupleList = list(rule[1])
+
+            while len(tupleList) > 2:
+                newSymbol = 'D' + str(productionCounter)
+                productionCounter += 1
+                newVariables.append(newSymbol)
+                newRules.append((rule[0], tuple([tupleList[0], newSymbol])))
+
+                tupleList = tupleList[1:]
+            else:
+                newRules.append((newSymbol, tuple([tupleList[0], tupleList[1]])))
+
+            newRules.remove(rule)
+
+    return terminals, set(newVariables), initial, set(newRules)
 
 
 def generate(terminals, variables, initial, rules):
