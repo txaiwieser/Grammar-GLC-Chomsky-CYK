@@ -1,3 +1,4 @@
+# coding=utf-8
 #
 # Versão do Python: 3.6.5
 #

@@ -1,3 +1,4 @@
+# coding=utf-8
 #
 # Versão do Python: 3.6.5
 #
@@ -11,27 +12,32 @@
 
 import re
 
+
 def askForFileName():
     option = input("Informe o nome do arquivo a ser usado: ")
     return str(option)
+
 
 def readFileWith(name):
     arq = open(name, 'r')
     return arq.readlines()
 
+
 def findCharInsideBrackets(string):
     selection = re.search(r"\[ ([A-Za-z]+) \]", string)
-    if selection != None:
+    if selection is not None:
         return selection.group(1)
     else:
         return None
 
+
 def findAndRemoveCharInsideBrackets(string):
     selection = re.search(r"\[ ([A-Za-z]+) \]", string)
-    if selection != None:
+    if selection is not None:
         return string[:selection.start()] + string[selection.end():]
     else:
         return None
+
 
 def extractGrammar(fileString, terminals, variables, initial, rules):
     current = None
@@ -60,7 +66,7 @@ def extractGrammar(fileString, terminals, variables, initial, rules):
                 char = findCharInsideBrackets(line)
                 line = findAndRemoveCharInsideBrackets(line)
                 prods = []
-                while char != None:
+                while char is not None:
                     prods.append(char)
                     char = findCharInsideBrackets(line)
                     line = findAndRemoveCharInsideBrackets(line)
