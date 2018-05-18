@@ -11,6 +11,7 @@
 
 import FileManager
 import RemoveUselessSymbols
+import RemoveEmptyProductions
 
 terminals = set()
 variables = set()
@@ -25,6 +26,7 @@ def showMenu():
     print("4 - Regras de Producao")
     print("5 - Tudo")
     print("6 - Resultado da Remoção de Símbolos Inúteis")
+    print("7 - Resultado da Remoção de Produções Vazias")
     print("X - Sair")
 
     option = input("-> ")
@@ -52,6 +54,10 @@ def showMenu():
 
     elif option == "6":
         G2 = RemoveUselessSymbols.removeUselessSymbols(terminals, variables, initial, rules)
+        printGrammar(G2[0], G2[1], G2[2], G2[3])
+
+    elif option == "7":
+        G2 = RemoveEmptyProductions.removeEmptyProductions(terminals, variables, initial, rules)
         printGrammar(G2[0], G2[1], G2[2], G2[3])
 
     else:
