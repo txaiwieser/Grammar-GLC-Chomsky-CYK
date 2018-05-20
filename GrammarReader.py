@@ -1,3 +1,4 @@
+# coding=utf-8
 #
 # Versão do Python: 3.6.5
 #
@@ -10,11 +11,16 @@
 #
 
 import FileManager
+import RemoveUselessSymbols
+import RemoveEmptyProductions
+import ProductionsSubstituteVariables
+import NormalFormOfChomsky
 
-terminals = []
-variables = []
-initial = []
-rules = []
+terminals = set()
+variables = set()
+initial = set()
+rules = set()
+
 
 def showMenu():
     print("Leitor de Grámatica, escolha uma opção para exibir:\n")
@@ -22,17 +28,22 @@ def showMenu():
     print("2 - Variaveis")
     print("3 - Simbolo Inicial")
     print("4 - Regras de Producao")
-    print("X - Voltar")
+    print("5 - Tudo")
+    print("6 - Resultado da Remoção de Símbolos Inúteis")
+    print("7 - Resultado da Remoção de Produções Vazias")
+    print("8 - Resultado das Produções que Substituem Variáveis")
+    print("9 - Resultado da Forma Normal de Chomsky")
+    print("X - Sair")
 
     option = input("-> ")
     option = str(option)
     print("\n")
 
-    if option == "1": 
+    if option == "1":
         print("Terminais: ")
         printList(terminals)
 
-    elif option == "2": 
+    elif option == "2":
         print("Variaveis:")
         printList(variables)
 
@@ -44,16 +55,53 @@ def showMenu():
         print("Regras:")
         print("\n".join(map(lambda x: x[0] + " -> " + " | ".join(x[1]), rules)))
 
+    elif option == "5":
+        printGrammar(terminals, variables, initial, rules)
+
+    elif option == "6":
+        G2 = RemoveUselessSymbols.removeUselessSymbols(terminals, variables, initial, rules)
+        printGrammar(G2[0], G2[1], G2[2], G2[3])
+
+    elif option == "7":
+        G2 = RemoveEmptyProductions.removeEmptyProductions(terminals, variables, initial, rules)
+        printGrammar(G2[0], G2[1], G2[2], G2[3])
+
+    elif option == "8":
+        G2 = ProductionsSubstituteVariables.generate(terminals, variables, initial, rules)
+        printGrammar(G2[0], G2[1], G2[2], G2[3])
+
+    elif option == "9":
+        G2 = NormalFormOfChomsky.generate(terminals, variables, initial, rules)
+        printGrammar(G2[0], G2[1], G2[2], G2[3])
+
     else:
         return -1
 
     input("\nPressione uma tecla para continuar.")
+
     return showMenu()
+
 
 def printList(list):
     string = ', '.join(list)
     print(string)
 
+
+def printGrammar(t, v, i, r):
+    print("Terminais: ")
+    printList(t)
+    print("\nVariaveis:")
+    printList(v)
+    print("\nSimbolo Inicial:")
+    print("".join(i))
+    print("\nRegras:")
+    print("\n".join(map(lambda x: x[0] + " -> " + "".join(x[1]), r)))
+
+
+def showMenuFor(fileName):
+    fullFile = FileManager.readFileWith('./examples/' + fileName)
+    FileManager.extractGrammar(fullFile, terminals, variables, initial, rules)
+    return showMenu()
 
 def start():
     fileName = FileManager.askForFileName()
