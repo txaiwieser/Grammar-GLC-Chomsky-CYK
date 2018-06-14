@@ -24,16 +24,17 @@ rules = set()
 
 def showMenu():
     print("Leitor de Grámatica, escolha uma opção para exibir:\n")
-    print("1 - Terminais")
-    print("2 - Variaveis")
-    print("3 - Simbolo Inicial")
-    print("4 - Regras de Producao")
-    print("5 - Tudo")
-    print("6 - Resultado da Remoção de Símbolos Inúteis")
-    print("7 - Resultado da Remoção de Produções Vazias")
-    print("8 - Resultado das Produções que Substituem Variáveis")
-    print("9 - Resultado da Forma Normal de Chomsky")
-    print("X - Sair")
+    print("1  - Terminais")
+    print("2  - Variaveis")
+    print("3  - Simbolo Inicial")
+    print("4  - Regras de Producao")
+    print("5  - Imprimir toda a gramática")
+    print("6  - Resultado da Remoção de Símbolos Inúteis")
+    print("7  - Resultado da Remoção de Produções Vazias")
+    print("8  - Resultado das Produções que Substituem Variáveis")
+    print("9  - Resultado da Forma Normal de Chomsky")
+    print("10 - Executar algoritmo de Cocke-Younger-Kasami")
+    print("X  - Sair")
 
     option = input("-> ")
     option = str(option)
@@ -73,6 +74,10 @@ def showMenu():
     elif option == "9":
         G2 = NormalFormOfChomsky.generate(terminals, variables, initial, rules)
         printGrammar(G2[0], G2[1], G2[2], G2[3])
+
+    elif option == "10":
+        # CYK.run((terminals, variables, initial, rules), "asd")
+        print("Ainda não está pronto!")
 
     else:
         return -1
