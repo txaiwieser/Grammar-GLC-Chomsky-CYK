@@ -15,6 +15,7 @@ import RemoveUselessSymbols
 import RemoveEmptyProductions
 import ProductionsSubstituteVariables
 import NormalFormOfChomsky
+import CYK
 
 terminals = set()
 variables = set()
@@ -76,8 +77,11 @@ def showMenu():
         printGrammar(G2[0], G2[1], G2[2], G2[3])
 
     elif option == "10":
-        # CYK.run((terminals, variables, initial, rules), "asd")
-        print("Ainda não está pronto!")
+        word = input("Palavra a ser verificada: ")
+        if CYK.run((terminals, variables, initial, rules), word):
+            print("Palavra aceita!")
+        else:
+            print("Palavra rejeitada!")
 
     else:
         return -1
