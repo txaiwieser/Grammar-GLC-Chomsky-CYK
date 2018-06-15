@@ -10,6 +10,7 @@
 # 00217052 - Txai Wieser
 #
 
+import NormalFormOfChomsky
 import Subword
 
 def run(grammar, word):
@@ -17,6 +18,9 @@ def run(grammar, word):
 
     # Palavra vazia deve ser rejeitada sempre porque gramáticas na FNC não aceitam a palavra vazia
     if wordlen == 0: return False
+
+    # Passo 0: colocar a gramática na FNC
+    grammar = NormalFormOfChomsky.generate(grammar[0], grammar[1], grammar[2], grammar[3])
 
     # Passo 1: criar dicionário que relaciona o rabo (tail) das produções com a cabeça (head) delas
     inverted = createInvertedTable(grammar)
