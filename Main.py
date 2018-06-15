@@ -39,6 +39,10 @@ def grammarExampleFive():
     return GrammarReader.showMenuFor('gramatica_exemplo5.txt')
 
 
+def grammarExampleSix():
+    return GrammarReader.showMenuFor('gramatica_exemplo6.txt')
+
+
 def showIntro():
     print(
         """
@@ -59,6 +63,7 @@ def showMenu():
     print("4 - Ler Gramática Exemplo 3")
     print("5 - Ler Gramática Exemplo 4")
     print("6 - Ler Gramática Exemplo 5")
+    print("7 - Ler Gramática Exemplo 6")
 
     option = input("Escolha uma opção: ")
     option = str(option)
@@ -76,6 +81,8 @@ def showMenu():
         out = grammarExampleFour()
     elif option == "6":
         out = grammarExampleFive()
+    elif option == "7":
+        out = grammarExampleSix()
     else:
         print("Exit")
 
