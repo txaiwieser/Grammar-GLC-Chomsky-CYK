@@ -20,17 +20,19 @@ def run(grammar, word):
     if wordlen == 0: return False
 
     # Passo 0: colocar a gramática na FNC
-    grammar = NormalFormOfChomsky.generate(grammar[0], grammar[1], grammar[2], grammar[3])
+    #grammar = NormalFormOfChomsky.generate(grammar[0], grammar[1], grammar[2], grammar[3])
 
     # Passo 1: criar dicionário que relaciona o rabo (tail) das produções com a cabeça (head) delas
     inverted = createInvertedTable(grammar)
 
     # Passo 2: criar matriz triangular do tamanho da palavra
     matrix = createMatrix(word)
+    auxMatrix = createAuxMatrix(word)
 
     # Passo 3: preencher a primeira fileira da matriz e verificar se ela é valida
     if not fillFirstRow(matrix, inverted, word):
         return False # erro, a palavra contém um terminal nada a ver; não é aceita
+    fillFirstRowAuxMatrix(auxMatrix, matrix, word)
 
     # Passo 4: algoritmo principal
     if wordlen > 1:
@@ -41,16 +43,29 @@ def run(grammar, word):
                 for slice in divisions:
                     leftSet = findSetOfSubword(matrix, slice[0])
                     rightSet = findSetOfSubword(matrix, slice[1])
-                    product = pseudoCartesianProduct(leftSet, rightSet)
+                    product = cartesianProduct(leftSet, rightSet)
                     for tail in product:
                         if tail in inverted:
-                            matrix[row][col] |= inverted[tail]
+                            generators = inverted[tail]
+                            matrix[row][col] |= generators
+                            for variable in generators:
+                                if variable in auxMatrix[row][col]:
+                                    auxMatrix[row][col][variable] |= {slice, }
+                                else:
+                                    auxMatrix[row][col][variable] = {slice, }
+
 
     printMatrix(matrix)
+    print("\n")
+    printMatrix(auxMatrix)
+    print("\n")
 
     # Passo 5: checar se a palavra foi aceita
-    for initial in grammar[2]:
-        return initial in matrix[wordlen - 1][0]
+    if isAccepted(word, grammar, matrix):
+
+        # Passo 6: criar árvores de derivação
+        generateParseTrees(word, matrix, auxMatrix, grammar, inverted)
+        return True
 
     return False
 
@@ -74,6 +89,11 @@ def createMatrix(word):
     return [[set() for col in range(wordlen - row)] for row in range(wordlen)]
 
 
+def createAuxMatrix(word):
+    wordlen = len(word)
+    return [[{} for col in range(wordlen - row)] for row in range(wordlen)]
+
+
 def printMatrix(matrix):
     for row in reversed(matrix):
         print(row)
@@ -90,12 +110,166 @@ def fillFirstRow(matrix, inverted, word):
     return True
 
 
+def fillFirstRowAuxMatrix(auxMatrix, matrix, word):
+    for i in range(len(word)):
+        varSet = matrix[0][i]
+        for variable in varSet:
+            auxMatrix[0][i][variable] = ((i, word[i]), (i+1, ""))
+
+
 def findSetOfSubword(matrix, subword):
     return matrix[len(subword[1]) - 1][subword[0]]
 
 
-def pseudoCartesianProduct(a, b):
-    if len(a) == 0: return b
-    if len(b) == 0: return a
+def cartesianProduct(a, b):
+    #if len(a) == 0: return b
+    #if len(b) == 0: return a
 
     return set([(x, y) for x in a for y in b])
+
+
+def getInitial(grammar):
+    for initial in grammar[2]: return initial
+
+
+def isAccepted(word, grammar, matrix):
+    return getInitial(grammar) in matrix[len(word) - 1][0]
+
+
+# parse tree node: (variable, slice)
+
+
+def generateParseTrees(word, matrix, auxMatrix, grammar, inverted):
+    stackList = []
+
+    initial = getInitial(grammar)
+    dictInitial = auxMatrix[len(word) - 1][0]
+
+    # Existe um caso especial, especialíssimo, o dicionário auxiliar de S não conterá a chave S
+    # (ao mesmo tempo que a palavra É ACEITA), esse caso é quando a palavra é um terminal.
+    # Dessa forma, como a palavra-terminal é aceita, só precisamos imprimir S->a, onde a é a palavra-terminal
+    # Esse caso especial não quebra o algoritmo pq generateParseTrees só é chamada quando a palavra é aceita
+    if not (initial in dictInitial):
+        print(initial + "->" + word)
+        return
+
+    initialSlices = dictInitial[initial]
+    for slice in initialSlices:
+        stackList.append(([(initial, slice, 0), ], []))
+
+    print(stackList)
+    print("\n")
+
+    while len(stackList) > 0:
+        stackAndStrList = stackList.pop()
+        strList = stackAndStrList[1]
+        processParseTree(stackAndStrList, word, matrix, auxMatrix, inverted, stackList)
+        for str in strList:
+            print(str, end='')
+
+        print("\n", end='')
+
+
+def getFirst(set):
+    for item in set:
+        return item
+
+
+def processParseTree(stackAndStr, word, matrix, auxMatrix, inverted, stackList):
+    stack = stackAndStr[0]
+    strList = stackAndStr[1]
+    while len(stack) > 0:
+        node = stack.pop()
+
+        variable = node[0]
+        slice = node[1]
+        ident = node[2]
+
+        #print(variable + '[ ', end='')
+        printIdent(ident, strList)
+
+
+        #print(variable, end='')
+        strList.append(variable)
+        #print(variable, end='')
+
+        #print(slice, end='')
+        #if len(slice[0]) == 1:
+        if type(slice[0]) is int:
+            #print("->" + slice[1])
+            # print(variable, end='')
+            strList.append("->" + slice[1] + "\n")
+            continue
+
+        #print(str(type(slice)) + " " + str(slice))
+
+        #if (len(slice[0][1]) == 1) and (len(slice[1][1]) == 1):
+        #    print(slice[0][1], end='')
+        #    print(slice[1][1], end='')
+        #    continue
+
+        ## if (len(slice[1][1]) == 1): print(slice[1][1])
+
+        # subword = (col, word[col:col + row + 1])
+
+
+        leftSet = findSetOfSubword(matrix, slice[0])
+        rightSet = findSetOfSubword(matrix, slice[1])
+        product = cartesianProduct(leftSet, rightSet)
+        isFirstIteration = True
+        for tail in product:
+            if tail in inverted:
+                generators = inverted[tail]
+                if variable in generators:
+
+                    if isFirstIteration:
+                        parseTreeLoop(auxMatrix, ident, slice, stack, strList, tail, stackList)
+                        isFirstIteration = False
+                    else:
+                        strList2 = list(strList)
+                        stack2 = list(stack)
+                        parseTreeLoop(auxMatrix, ident, slice, stack2, strList2, tail, stackList)
+                        stackList.append((stack2, strList2))
+
+
+def parseTreeLoop(auxMatrix, ident, slice, stack, strList, tail, stackList):
+    strList.append("->" + tail[0] + tail[1] + "\n")
+    # if (len(slice[0][1]) != 1) and (len(slice[1][1]) != 1):
+    leftDict = findSetOfSubword(auxMatrix, slice[0])
+    rightDict = findSetOfSubword(auxMatrix, slice[1])
+
+    rightOptions = rightDict[tail[1]]
+    leftOptions = leftDict[tail[0]]
+
+    #print("options")
+    #print("left: " + str(rightOptions))
+    #print("right: " + str(leftOptions))
+
+    #createEndlessPossibilities(ident, leftOptions, rightOptions, stack, strList, tail)
+
+    choosenOne = (getFirst(leftOptions), getFirst(rightOptions))
+    pushStack(choosenOne, ident, stack, tail)
+
+
+def createEndlessPossibilities(ident, leftOptions, rightOptions, stack, strList, tail):
+    options = cartesianProduct(leftOptions, rightOptions)
+    isFirstIteration = True
+    for option in options:
+        if isFirstIteration:
+            pushStack(option, ident, stack, tail)
+            isFirstIteration = False
+        else:
+            strList2 = list(strList)
+            stack2 = list(stack)
+            # pushStack(option, ident, stack2, tail)
+            # stackList.append((stack2, strList2))
+
+
+def pushStack(choosenOne, ident, stack, tail):
+    stack.append((tail[1], choosenOne[1], ident + 3))
+    stack.append((tail[0], choosenOne[0], ident + 3))
+
+
+def printIdent(ident, strList):
+    for i in range(ident):
+        strList.append(" ")
