@@ -13,6 +13,7 @@
 import NormalFormOfChomsky
 import Subword
 
+
 def run(grammar, word):
     wordlen = len(word)
 
@@ -20,18 +21,20 @@ def run(grammar, word):
     if wordlen == 0: return False
 
     # Passo 0: colocar a gramática na FNC
-    #grammar = NormalFormOfChomsky.generate(grammar[0], grammar[1], grammar[2], grammar[3])
+    grammar = NormalFormOfChomsky.generate(grammar[0], grammar[1], grammar[2], grammar[3])
 
     # Passo 1: criar dicionário que relaciona o rabo (tail) das produções com a cabeça (head) delas
     inverted = createInvertedTable(grammar)
 
-    # Passo 2: criar matriz triangular do tamanho da palavra
+    # Passo 2: criar matriz triangular do tamanho da palavra e a matriz auxiliar
     matrix = createMatrix(word)
     auxMatrix = createAuxMatrix(word)
 
     # Passo 3: preencher a primeira fileira da matriz e verificar se ela é valida
+    # (e preencher a primeira fileira da matriz auxiliar tb)
     if not fillFirstRow(matrix, inverted, word):
         return False # erro, a palavra contém um terminal nada a ver; não é aceita
+
     fillFirstRowAuxMatrix(auxMatrix, matrix, word)
 
     # Passo 4: algoritmo principal
@@ -48,22 +51,25 @@ def run(grammar, word):
                         if tail in inverted:
                             generators = inverted[tail]
                             matrix[row][col] |= generators
+
+                            #coisas extras para preencher a matriz auxiliar
                             for variable in generators:
                                 if variable in auxMatrix[row][col]:
                                     auxMatrix[row][col][variable] |= {slice, }
                                 else:
                                     auxMatrix[row][col][variable] = {slice, }
 
-
+    # Imprimindo as matrizes
+    print("Matriz do algoritmo:")
     printMatrix(matrix)
-    print("\n")
+    print("\nMatriz auxiliar:")
     printMatrix(auxMatrix)
     print("\n")
 
     # Passo 5: checar se a palavra foi aceita
     if isAccepted(word, grammar, matrix):
 
-        # Passo 6: criar árvores de derivação
+        # Passo 6: criar e imprimir as árvores de derivação
         generateParseTrees(word, matrix, auxMatrix, grammar, inverted)
         return True
 
@@ -122,9 +128,6 @@ def findSetOfSubword(matrix, subword):
 
 
 def cartesianProduct(a, b):
-    #if len(a) == 0: return b
-    #if len(b) == 0: return a
-
     return set([(x, y) for x in a for y in b])
 
 
@@ -163,7 +166,7 @@ def generateParseTrees(word, matrix, auxMatrix, grammar, inverted):
     while len(stackList) > 0:
         stackAndStrList = stackList.pop()
         strList = stackAndStrList[1]
-        processParseTree(stackAndStrList, word, matrix, auxMatrix, inverted, stackList)
+        processParseTree(stackAndStrList, matrix, auxMatrix, inverted, stackList)
         for str in strList:
             print(str, end='')
 
@@ -175,7 +178,7 @@ def getFirst(set):
         return item
 
 
-def processParseTree(stackAndStr, word, matrix, auxMatrix, inverted, stackList):
+def processParseTree(stackAndStr, matrix, auxMatrix, inverted, stackList):
     stack = stackAndStr[0]
     strList = stackAndStr[1]
     while len(stack) > 0:
@@ -185,33 +188,13 @@ def processParseTree(stackAndStr, word, matrix, auxMatrix, inverted, stackList):
         slice = node[1]
         ident = node[2]
 
-        #print(variable + '[ ', end='')
         printIdent(ident, strList)
 
-
-        #print(variable, end='')
         strList.append(variable)
-        #print(variable, end='')
 
-        #print(slice, end='')
-        #if len(slice[0]) == 1:
         if type(slice[0]) is int:
-            #print("->" + slice[1])
-            # print(variable, end='')
             strList.append("->" + slice[1] + "\n")
             continue
-
-        #print(str(type(slice)) + " " + str(slice))
-
-        #if (len(slice[0][1]) == 1) and (len(slice[1][1]) == 1):
-        #    print(slice[0][1], end='')
-        #    print(slice[1][1], end='')
-        #    continue
-
-        ## if (len(slice[1][1]) == 1): print(slice[1][1])
-
-        # subword = (col, word[col:col + row + 1])
-
 
         leftSet = findSetOfSubword(matrix, slice[0])
         rightSet = findSetOfSubword(matrix, slice[1])
@@ -234,7 +217,6 @@ def processParseTree(stackAndStr, word, matrix, auxMatrix, inverted, stackList):
 
 def parseTreeLoop(auxMatrix, ident, slice, stack, strList, tail, stackList):
     strList.append("->" + tail[0] + tail[1] + "\n")
-    # if (len(slice[0][1]) != 1) and (len(slice[1][1]) != 1):
     leftDict = findSetOfSubword(auxMatrix, slice[0])
     rightDict = findSetOfSubword(auxMatrix, slice[1])
 
