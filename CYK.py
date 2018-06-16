@@ -160,17 +160,21 @@ def generateParseTrees(word, matrix, auxMatrix, grammar, inverted):
     for slice in initialSlices:
         stackList.append(([(initial, slice, 0), ], []))
 
+    print("Lista de pilhas inicial:")
     print(stackList)
-    print("\n")
+    print("")
 
+    treeCounter = 1
     while len(stackList) > 0:
         stackAndStrList = stackList.pop()
         strList = stackAndStrList[1]
-        processParseTree(stackAndStrList, matrix, auxMatrix, inverted, stackList)
-        for str in strList:
-            print(str, end='')
+        if processParseTree(stackAndStrList, matrix, auxMatrix, inverted, stackList):
+            print("Árvore de derivação " + str(treeCounter) + ":")
+            for string in strList:
+                print(string, end='')
 
-        print("\n", end='')
+            print("\n", end='')
+            treeCounter += 1
 
 
 def getFirst(set):
@@ -193,6 +197,9 @@ def processParseTree(stackAndStr, matrix, auxMatrix, inverted, stackList):
         strList.append(variable)
 
         if type(slice[0]) is int:
+            if len(slice[1]) == 0:
+                return False
+
             strList.append("->" + slice[1] + "\n")
             continue
 
@@ -204,16 +211,17 @@ def processParseTree(stackAndStr, matrix, auxMatrix, inverted, stackList):
             if tail in inverted:
                 generators = inverted[tail]
                 if variable in generators:
-
                     if isFirstIteration:
                         parseTreeLoop(auxMatrix, ident, slice, stack, strList, tail, stackList)
                         isFirstIteration = False
                     else:
-                        strList2 = list(strList)
-                        stack2 = list(stack)
+                        strList2 = strList[:-1]
+                        stack2 = stack[:-2]
                         parseTreeLoop(auxMatrix, ident, slice, stack2, strList2, tail, stackList)
                         stackList.append((stack2, strList2))
+                        #print(stackList)
 
+    return True
 
 def parseTreeLoop(auxMatrix, ident, slice, stack, strList, tail, stackList):
     strList.append("->" + tail[0] + tail[1] + "\n")
@@ -223,28 +231,27 @@ def parseTreeLoop(auxMatrix, ident, slice, stack, strList, tail, stackList):
     rightOptions = rightDict[tail[1]]
     leftOptions = leftDict[tail[0]]
 
-    #print("options")
-    #print("left: " + str(rightOptions))
-    #print("right: " + str(leftOptions))
-
-    #createEndlessPossibilities(ident, leftOptions, rightOptions, stack, strList, tail)
-
-    choosenOne = (getFirst(leftOptions), getFirst(rightOptions))
-    pushStack(choosenOne, ident, stack, tail)
+    createEndlessPossibilities(ident, leftOptions, rightOptions, stack, strList, tail, stackList)
 
 
-def createEndlessPossibilities(ident, leftOptions, rightOptions, stack, strList, tail):
+def createEndlessPossibilities(ident, leftOptions, rightOptions, stack, strList, tail, stackList):
     options = cartesianProduct(leftOptions, rightOptions)
     isFirstIteration = True
     for option in options:
+        # Esses ifs são necessários pq os terminais são modelados na matriz auxiliar de um jeito
+        # meio estranho, e eles podem dar crepe no algoritmo </3
+        if len(option[0][1]) == 0: continue
+        if len(option[1][1]) == 0: continue
+
         if isFirstIteration:
             pushStack(option, ident, stack, tail)
             isFirstIteration = False
         else:
-            strList2 = list(strList)
-            stack2 = list(stack)
-            # pushStack(option, ident, stack2, tail)
-            # stackList.append((stack2, strList2))
+            strList2 = strList[:]
+            stack2 = stack[:-2]
+            pushStack(option, ident, stack2, tail)
+            stackList.append((stack2, strList2))
+            #print(stackList)
 
 
 def pushStack(choosenOne, ident, stack, tail):
