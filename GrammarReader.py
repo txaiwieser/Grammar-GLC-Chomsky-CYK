@@ -73,6 +73,10 @@ def showMenu():
         printGrammar(G2[0], G2[1], G2[2], G2[3])
 
     elif option == "9":
+        print("Gramática simplificada:")
+        GS = NormalFormOfChomsky.firstStep(terminals, variables, initial, rules)
+        printGrammar(GS[0], GS[1], GS[2], GS[3])
+        print("\nGramática na FNC:")
         G2 = NormalFormOfChomsky.generate(terminals, variables, initial, rules)
         printGrammar(G2[0], G2[1], G2[2], G2[3])
 
