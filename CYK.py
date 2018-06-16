@@ -148,14 +148,6 @@ def generateParseTrees(word, matrix, auxMatrix, grammar, inverted):
     initial = getInitial(grammar)
     dictInitial = auxMatrix[len(word) - 1][0]
 
-    # Existe um caso especial, especialíssimo, o dicionário auxiliar de S não conterá a chave S
-    # (ao mesmo tempo que a palavra É ACEITA), esse caso é quando a palavra é um terminal.
-    # Dessa forma, como a palavra-terminal é aceita, só precisamos imprimir S->a, onde a é a palavra-terminal
-    # Esse caso especial não quebra o algoritmo pq generateParseTrees só é chamada quando a palavra é aceita
-    if not (initial in dictInitial):
-        print(initial + "->" + word)
-        return
-
     initialSlices = dictInitial[initial]
     for slice in initialSlices:
         stackList.append(([(initial, slice, 0), ], []))
