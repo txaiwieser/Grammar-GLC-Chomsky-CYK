@@ -18,7 +18,9 @@ def run(grammar, word):
     wordlen = len(word)
 
     # Palavra vazia deve ser rejeitada sempre porque gramáticas na FNC não aceitam a palavra vazia
-    if wordlen == 0: return False
+    if wordlen == 0:
+        print("A palavra vazia nunca é aceita por uma gramática na FNC!")
+        return False
 
     # Passo 0: colocar a gramática na FNC
     grammar = NormalFormOfChomsky.generate(grammar[0], grammar[1], grammar[2], grammar[3])
@@ -33,6 +35,7 @@ def run(grammar, word):
     # Passo 3: preencher a primeira fileira da matriz e verificar se ela é valida
     # (e preencher a primeira fileira da matriz auxiliar tb)
     if not fillFirstRow(matrix, inverted, word):
+        print("A palavra contém um terminal inválido!")
         return False # erro, a palavra contém um terminal nada a ver; não é aceita
 
     fillFirstRowAuxMatrix(auxMatrix, matrix, word)
@@ -64,7 +67,7 @@ def run(grammar, word):
     printMatrix(matrix)
     print("\nMatriz auxiliar:")
     printMatrix(auxMatrix)
-    print("\n")
+    print("")
 
     # Passo 5: checar se a palavra foi aceita
     if isAccepted(word, grammar, matrix):
@@ -139,7 +142,7 @@ def isAccepted(word, grammar, matrix):
     return getInitial(grammar) in matrix[len(word) - 1][0]
 
 
-# parse tree node: (variable, slice)
+# parse tree node: (variable, slice, identation)
 
 
 def generateParseTrees(word, matrix, auxMatrix, grammar, inverted):
@@ -160,6 +163,10 @@ def generateParseTrees(word, matrix, auxMatrix, grammar, inverted):
     while len(stackList) > 0:
         stackAndStrList = stackList.pop()
         strList = stackAndStrList[1]
+
+        # Esse if existe por existem casos onde podem ser criadas parse trees inválidas
+        # (isso acontece em gramáticas onde S->a, onde S é o símbolo inicial e a é um terminal)
+        # Então, nós filtramos esses casos errados
         if processParseTree(stackAndStrList, matrix, auxMatrix, inverted, stackList):
             print("Árvore de derivação " + str(treeCounter) + ":")
             for string in strList:
@@ -167,11 +174,6 @@ def generateParseTrees(word, matrix, auxMatrix, grammar, inverted):
 
             print("\n", end='')
             treeCounter += 1
-
-
-def getFirst(set):
-    for item in set:
-        return item
 
 
 def processParseTree(stackAndStr, matrix, auxMatrix, inverted, stackList):
@@ -188,7 +190,12 @@ def processParseTree(stackAndStr, matrix, auxMatrix, inverted, stackList):
 
         strList.append(variable)
 
+        # Se estivermos em um terminal, é só imprimir ele
         if type(slice[0]) is int:
+            # Caso especial, onde o terminal é a palavra vazia
+            # (isso aparece em gramáticas onde S->a, onde S é o símbolo inicial e a é um terminal,
+            # devido à implementação da primeira linha da matriz auxiliar)
+            # Retornamos false porque essa parse tree é inválida
             if len(slice[1]) == 0:
                 return False
 
