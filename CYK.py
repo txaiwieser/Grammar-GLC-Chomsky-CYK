@@ -15,6 +15,11 @@ import Subword
 
 
 def run(grammar, word):
+    # Removendo whitespace e resolvendo o caso em que os terminais possuem mais de um caracter
+    word = word.strip()
+    if ' ' in word: #Se a palavra tiver algum espaço, transforma ela em tupla
+        word = tuple(word.split())
+
     wordlen = len(word)
 
     # Palavra vazia deve ser rejeitada sempre porque gramáticas na FNC não aceitam a palavra vazia
