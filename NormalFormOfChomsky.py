@@ -30,17 +30,31 @@ def substitute(newValue, oldValue, list):
 
 def secondStep(terminals, variables, initial, rules):
     newVariables = list(variables)
-    newRules = list(rules)
+    newRules = []
+    isNewProduction = False
+    newProduction = None
 
-    for idx, rule in enumerate(newRules):
+    for idx, rule in enumerate(rules):
         if len(rule[1]) >= 2:
+            isNewProduction = False
+            newProduction = list(rule[1])
             for symbol in rule[1]:
                 if symbol in terminals:
+                    isNewProduction = True
                     newSymbol = 'C' + symbol
                     newVariables.append(newSymbol)
                     newRules.append((newSymbol, tuple(symbol)))
-                    ruleList = [rule[0], tuple(substitute(newSymbol, symbol, list(rule[1])))]
-                    newRules[idx] = tuple(ruleList)
+                    newProduction = substitute(newSymbol, symbol, newProduction)
+                    
+            if isNewProduction:
+                newProduction = tuple([rule[0], tuple(newProduction)])
+                newRules.append(newProduction) 
+            else:
+                newRules.append(rule)
+        else:
+            newRules.append(rule)
+                
+                    
 
 
 
